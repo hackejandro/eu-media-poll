@@ -29,6 +29,19 @@
             margin-top: 0;
             margin-bottom: 20px;
         }
+        .wrapper {
+            width:600px;
+            margin: 0 auto;
+        }
+
+        #block1 {
+            float:left;
+        }
+
+        #block2
+        {
+            float:right;
+        }
 
         /* Main container for the axes and logos */
         #main-container {
@@ -173,12 +186,21 @@
 
     <h1><span id="rainbow-text">EU Media Vibe Check</span></h1>
     <p>How do you see different EU media? Rate them for:</p>
+    <div class="wrapper">
+    
+    <div id="block1">
     <h4>Access ↔ Adversarial</h4>
     <p><b>Access</b>: journalism built on cultivating proximity to power, exclusive leaks, sympathetic framing.</p>
-    <p><b>Adversarial</b>: watchdog, confrontational, investigative, holding power to account.</p>
-    <h4>Highbrow ↔ Lowbrow</h4>
+    <p><b>Adversarial</b>: watchdog, confrontational, investigative, holding power to account.</p>    </div>
+        
+    <div id="block2">
+     <h4>Highbrow ↔ Lowbrow</h4>
     <p><b>Highbrow</b>: policy wonkery, dense analysis, intellectual framing.</p>
-    <p><b>Lowbrow</b>: gossip, personalities, horse-race politics, drama.</p>
+    <p><b>Lowbrow</b>: gossip, personalities, horse-race politics, drama.</p>    </div>
+  
+    </div>
+   
+   
 
     <div id="main-container">
         <div id="x-axis" class="axis"></div>
