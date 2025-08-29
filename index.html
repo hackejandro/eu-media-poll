@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EU Publications 2-Axis Rating</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* General Styling */
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f2f5;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* Header and Subheader */
+        h1 {
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+        p {
+            color: #4a5568;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        /* Main container for the axes and logos */
+        #main-container {
+            width: 90vw;
+            height: 80vh;
+            max-width: 800px;
+            max-height: 600px;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        /* The Axis lines */
+        .axis {
+            background-color: #cbd5e0;
+            position: absolute;
+            border-radius: 2px;
+        }
+        #x-axis {
+            width: 100%;
+            height: 4px;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+        }
+        #y-axis {
+            width: 4px;
+            height: 100%;
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+        }
+        
+        /* Labels for the axes */
+        .label {
+            position: absolute;
+            font-size: 1rem; /* Adjusted from your 2rem for better fit */
+            font-weight: bold;
+            color: #4a5568;
+        }
+        #label-access { left: -60px; top: 50%; transform: translateY(-50%); }
+        #label-adversarial { right: -90px; top: 50%; transform: translateY(-50%); }
+        #label-highbrow { top: -30px; left: 50%; transform: translateX(-50%); }
+        #label-lowbrow { bottom: -30px; left: 50%; transform: translateX(-50%); }
+
+        /* Styling for the draggable logo containers */
+        .logo-container {
+            position: absolute;
+            cursor: grab;
+            width: 50px; /* Kept your smaller size */
+            height: 50px; /* Kept your smaller size */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .logo-container:active {
+            cursor: grabbing;
+            z-index: 1000;
+            transform: translate(-50%, -50%) scale(1.05);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            max-width: 80%;
+            max-height: 80%;
+            pointer-events: none;
+            -webkit-user-drag: none;
+            user-select: none;
+        }
+        
+        .tooltip {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2d3748;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+            pointer-events: none;
+            z-index: 2000;
+        }
+        
+        .logo-container:hover .tooltip {
+            opacity: 1;
+        }
+
+        /* Rainbow Text Animation */
+        @keyframes rainbow-cycle {
+            0%, 100% { color: #ff2a2a; } 15% { color: #ff7a2a; } 30% { color: #ffc52a; }
+            45% { color: #2aff2a; } 60% { color: #2a7aff; } 75% { color: #4b0082; } 90% { color: #ee82ee; }
+        }
+        #rainbow-text span { animation: rainbow-cycle 4s linear infinite; }
+
+        /* Submit Button */
+        #submit-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(45deg, #4f46e5, #7c3aed);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #submit-btn:hover { transform: translateY(-2px); box-shadow: 0 7px 10px rgba(0, 0, 0, 0.1); }
+        #submit-btn:disabled { background: #9ca3af; cursor: not-allowed; transform: translateY(0); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+
+        /* Feedback Message */
+        #message {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s, transform 0.5s;
+            pointer-events: none;
+        }
+        #message.success { background-color: #d1fae5; color: #065f46; }
+        #message.error { background-color: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+
+    <h1><span id="rainbow-text">Cool-O-Meter</span>: EU Media edition</h1>
+    <p>Let's have some fun. Drag the logos to rate them on both axes.</p>
+
+    <div id="main-container">
+        <div id="x-axis" class="axis"></div>
+        <div id="y-axis" class="axis"></div>
+        
+        <span id="label-access" class="label">Access</span>
+        <span id="label-adversarial" class="label">Adversarial</span>
+        <span id="label-highbrow" class="label">Highbrow</span>
+        <span id="label-lowbrow" class="label">Lowbrow</span>
+
+        <!-- Publication Logos (from your file) -->
+        <div class="logo-container" data-publication="Politico"><img src="https://logo.clearbit.com/politico.eu" class="logo" alt="Politico" onerror="this.onerror=null;this.src='https://placehold.co/100x40/000000/FFFFFF?text=Politico';"></div>
+        <div class="logo-container" data-publication="Euractiv"><img src="https://logo.clearbit.com/euractiv.com" class="logo" alt="Euractiv" onerror="this.onerror=null;this.src='https://placehold.co/100x40/000000/FFFFFF?text=Euractiv';"></div>
+        <div class="logo-container" data-publication="EUobserver"><img src="https://pbs.twimg.com/profile_images/1810305249112195072/anjXCvnl_400x400.png" class="logo" alt="EUobserver" onerror="this.onerror=null;this.src='https://placehold.co/100x40/000000/FFFFFF?text=EUobserver';"></div>
+        <div class="logo-container" data-publication="Euronews"><img src="https://logo.clearbit.com/euronews.com" class="logo" alt="Euronews" onerror="this.onerror=null;this.src='https://placehold.co/100x40/000000/FFFFFF?text=Euronews';"></div>
+        <div class="logo-container" data-publication="MLex"><img src="https://logo.clearbit.com/mlex.com" class="logo" alt="MLex" onerror="this.onerror=null;this.src='https://placehold.co/100x40/000000/FFFFFF?text=MLex';"></div>
+        <div class="logo-container" data-publication="FollowTheMoney"><img src="https://logo.clearbit.com/ftm.eu" class="logo" alt="Follow The Money" onerror="this.onerror=null;this.src='https://placehold.co/100x40/000000/FFFFFF?text=FTM';"></div>
+        <div class="logo-container" data-publication="TheEuropeanCorrespondent"><img src="https://logo.clearbit.com/europeancorrespondent.com" class="logo" alt="The European Correspondent" onerror="this.onerror=null;this.src='https://placehold.co/100x40/000000/FFFFFF?text=TEC';"></div>
+        <div class="logo-container" data-publication="CapitolForum"><img src="https://logo.clearbit.com/thecapitolforum.com" class="logo" alt="Capitol Forum" onerror="this.onerror=null;this.src='https://placehold.co/100x40/000000/FFFFFF?text=Capitol+Forum';"></div>
+        <div class="logo-container" data-publication="BrusselsTimes"><img src="https://logo.clearbit.com/brusselstimes.com" class="logo" alt="The Brussels Times" onerror="this.onerror=null;this.src='https://placehold.co/100x40/000000/FFFFFF?text=Brussels+Times';"></div>
+        <div class="logo-container" data-publication="AgenceEurope"><img src="https://logo.clearbit.com/agenceurope.eu" class="logo" alt="Agence Europe" onerror="this.onerror=null;this.src='https://placehold.co/100x40/000000/FFFFFF?text=Agence+Europe';"></div>
+        <div class="logo-container" data-publication="ParliamentMagazine"><img src="https://logo.clearbit.com/theparliamentmagazine.eu" class="logo" alt="The Parliament Magazine" onerror="this.onerror=null;this.src='https://placehold.co/100x40/000000/FFFFFF?text=The+Parliament+Magazine';"></div>
+        <div class="logo-container" data-publication="EUAlive"><img src="https://logo.clearbit.com/eualive.net" class="logo" alt="EU Alive" onerror="this.onerror=null;this.src='https://placehold.co/100x40/000000/FFFFFF?text=EU+Alive';"></div>
+        <div class="logo-container" data-publication="VoxEurop"><img src="https://logo.clearbit.com/voxeurop.eu" class="logo" alt="Vox Europ" onerror="this.onerror=null;this.src='https://placehold.co/100x40/000000/FFFFFF?text=Vox+Europ';"></div>
+        <div class="logo-container" data-publication="InvestigateEurope"><img src="https://logo.clearbit.com/investigate-europe.eu/" class="logo" alt="Investigate Europe" onerror="this.onerror=null;this.src='https://placehold.co/100x40/000000/FFFFFF?text=Investigate+Europe';"></div>
+        <div class="logo-container" data-publication="Contexte"><img src="https://logo.clearbit.com/contexte.com/" class="logo" alt="Contexte" onerror="this.onerror=null;this.src='https://placehold.co/100x40/000000/FFFFFF?text=Contexte';"></div>
+    </div>
+
+    <button id="submit-btn">Submit Scores</button>
+    <div id="message"></div>
+
+    <script src="https://unpkg.com/draggabilly@3/dist/draggabilly.pkgd.min.js"></script>
+
+    <script>
+        const WEB_APP_URL = 'YOUR_WEB_APP_URL_GOES_HERE'; // Make sure to use the correct URL
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('main-container');
+            const submitBtn = document.getElementById('submit-btn');
+            const messageDiv = document.getElementById('message');
+            const logos = document.querySelectorAll('.logo-container');
+            
+            const rainbowText = document.getElementById('rainbow-text');
+            const text = rainbowText.textContent;
+            rainbowText.innerHTML = '';
+            text.split('').forEach((char, index) => {
+                const span = document.createElement('span');
+                span.textContent = char;
+                span.style.animationDelay = `${index * 0.1}s`;
+                rainbowText.appendChild(span);
+            });
+
+            logos.forEach(logo => {
+                const draggie = new Draggabilly(logo, {
+                    containment: '#main-container' // Removed axis constraint for 2D movement
+                });
+
+                const publicationName = logo.dataset.publication;
+                const formattedName = publicationName.replace(/([A-Z])/g, ' $1').trim();
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
+                tooltip.textContent = formattedName;
+                logo.appendChild(tooltip);
+            });
+
+            const showMessage = (text, type) => {
+                messageDiv.textContent = text;
+                messageDiv.className = `message ${type}`;
+                messageDiv.style.opacity = 1;
+                messageDiv.style.transform = 'translateX(-50%) translateY(-10px)';
+                setTimeout(() => {
+                    messageDiv.style.opacity = 0;
+                    messageDiv.style.transform = 'translateX(-50%) translateY(0)';
+                }, 3000);
+            };
+
+            submitBtn.addEventListener('click', () => {
+                const scores = {};
+                const containerWidth = container.offsetWidth;
+                const containerHeight = container.offsetHeight;
+
+                logos.forEach(logo => {
+                    const publicationName = logo.dataset.publication;
+                    const logoWidth = logo.offsetWidth;
+                    const logoHeight = logo.offsetHeight;
+                    
+                    const xPosition = logo.offsetLeft + logoWidth / 2;
+                    const yPosition = logo.offsetTop + logoHeight / 2;
+                    
+                    // X-Axis Score: Access (-10) to Adversarial (10)
+                    const xScore = (xPosition / containerWidth) * 20 - 10;
+                    
+                    // Y-Axis Score: Highbrow (10) to Lowbrow (-10)
+                    const yScore = -((yPosition / containerHeight) * 20 - 10);
+
+                    scores[publicationName] = {
+                        x: xScore.toFixed(2),
+                        y: yScore.toFixed(2)
+                    };
+                });
+                
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Submitting...';
+
+                fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(scores)
+                })
+                .then(response => {
+                    console.log('Submission successful. Data sent:', scores);
+                    submitBtn.textContent = 'Submitted!';
+                    showMessage('Thanks! Your scores have been submitted.', 'success');
+                    setTimeout(() => { submitBtn.style.display = 'none'; }, 2000);
+                })
+                .catch(error => {
+                    console.error('Error submitting scores:', error);
+                    showMessage('Submission failed. Please try again.', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Scores';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
