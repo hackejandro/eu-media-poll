@@ -1,11 +1,11 @@
 (() => {
   'use strict';
 
-  const CONFIG = Object.assign({ supabaseUrl:'', supabaseAnonKey:'', siteUrl:location.origin + location.pathname, timeZone:'Europe/Brussels' }, window.THINK_TANK_CONFIG || {});
+  const CONFIG = Object.assign({ supabaseUrl:'', supabasePublishableKey:'', siteUrl:location.origin + location.pathname, timeZone:'Europe/Brussels' }, window.THINK_TANK_CONFIG || {});
   const app = document.getElementById('app');
   const CODE_KEY = 'euobserver_think_tank_code';
   const DEMO_PREFIX = 'euobserver_think_tank_demo_';
-  const isDemo = !CONFIG.supabaseUrl || !CONFIG.supabaseAnonKey;
+  const isDemo = !CONFIG.supabaseUrl || !CONFIG.supabasePublishableKey;
 
   const Brussels = {
     parts(date=new Date()) { const f=new Intl.DateTimeFormat('en-GB',{timeZone:CONFIG.timeZone,year:'numeric',month:'2-digit',day:'2-digit'}); const p=Object.fromEntries(f.formatToParts(date).map(x=>[x.type,x.value])); return `${p.year}-${p.month}-${p.day}`; },
@@ -28,7 +28,7 @@
   class SupabaseClient {
     constructor(url,key){this.url=String(url).replace(/\/$/,'');this.key=key;}
     async rpc(name,payload={}){
-      const r=await fetch(`${this.url}/rest/v1/rpc/${name}`,{method:'POST',headers:{'Content-Type':'application/json','apikey':this.key,'Authorization':`Bearer ${this.key}`},body:JSON.stringify(payload)});
+      const r=await fetch(`${this.url}/rest/v1/rpc/${name}`,{method:'POST',headers:{'Content-Type':'application/json','apikey':this.key},body:JSON.stringify(payload)});
       const text=await r.text(); let data={}; try{data=text?JSON.parse(text):{};}catch(_){throw new Error(text||'Invalid backend response');}
       if(!r.ok) throw new Error(data.message||data.error||`Backend error ${r.status}`);
       return data;
@@ -52,7 +52,7 @@
     async summary(day,code){const q=this.q(day),s=await this.status(day,code),actual=68,mean=61;return{ok:true,state:day<today?'closed':q.state,day,question:q.question,option_a:q.option_a,option_b:q.option_b,responses:1247,option_a_pct:actual,mean_prediction_a:mean,user:s.answered?{prediction:s.prediction,vote:s.vote,error:Math.abs(s.prediction-actual),beat_pct:73}:null};}
   }
 
-  const client=isDemo?new DemoClient():new SupabaseClient(CONFIG.supabaseUrl,CONFIG.supabaseAnonKey);
+  const client=isDemo?new DemoClient():new SupabaseClient(CONFIG.supabaseUrl,CONFIG.supabasePublishableKey);
 
   async function getCode(){
     let code=normaliseIdentity(localStorage.getItem(CODE_KEY));

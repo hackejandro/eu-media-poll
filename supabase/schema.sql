@@ -41,6 +41,7 @@ create or replace function public.tt_clean_identity(v text)
 returns text
 language sql
 immutable
+set search_path = public
 as $$
   select regexp_replace(upper(trim(coalesce(v,''))), '[^A-Z0-9 ]', ' ', 'g')
 $$;
@@ -198,6 +199,16 @@ grant execute on function public.tt_question(date) to anon, authenticated;
 grant execute on function public.tt_status(date,text) to anon, authenticated;
 grant execute on function public.tt_submit_answer(date,text,integer,text) to anon, authenticated;
 grant execute on function public.tt_summary(date,text) to anon, authenticated;
+
+-- Functions are executable by PUBLIC by default. Remove that implicit access so
+-- only the explicit anon/authenticated RPC grants above remain.
+revoke execute on function public.tt_clean_identity(text) from public, anon, authenticated;
+revoke execute on function public.tt_new_identity() from public;
+revoke execute on function public.tt_validate_identity(text) from public;
+revoke execute on function public.tt_question(date) from public;
+revoke execute on function public.tt_status(date,text) from public;
+revoke execute on function public.tt_submit_answer(date,text,integer,text) from public;
+revoke execute on function public.tt_summary(date,text) from public;
 
 -- Optional first test question: change the date/question before running if desired.
 -- insert into public.questions(day,question,option_a,option_b,status)

@@ -6,9 +6,9 @@ try {
 } catch (_) {}
 
 window.THINK_TANK_CONFIG = {
-  // Public Supabase project values. The anon key is designed to be used in browser apps.
-  supabaseUrl: '',
-  supabaseAnonKey: '',
+  // Public Supabase project values. The publishable key is designed for browser apps.
+  supabaseUrl: 'https://czvyukhxfdvjgljgxrke.supabase.co',
+  supabasePublishableKey: 'sb_publishable_PnnP9MVCQOFJ3mSGJgDgeA_q9QxuE5y',
   siteUrl: 'https://hackejandro.github.io/eu-media-poll/',
   timeZone: 'Europe/Brussels'
 };
