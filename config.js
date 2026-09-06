@@ -1,3 +1,12 @@
+// One-time migration: discard pre-Think-Tank numeric Brussels codes cached in this browser.
+try {
+  const key = 'euobserver_think_tank_code';
+  const legacy = localStorage.getItem(key) || '';
+  if (/^[A-Z-]+-\d{5}$/i.test(legacy) || /^\s*[A-Z]+\s+\d{5}\s*$/i.test(legacy)) {
+    localStorage.removeItem(key);
+  }
+} catch (_) {}
+
 window.THINK_TANK_CONFIG = {
   // Paste the deployed Google Apps Script Web App URL here.
   // Leave blank to run the frontend in demo mode.
