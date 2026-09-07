@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig.json",
+  "compilerOptions": {
+    "composite": true, "strict": true, "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true, "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true, "noUnusedParameters": true,
+    "module": "ESNext", "moduleResolution": "Bundler", "target": "ES2022", "rewriteRelativeImportExtensions": true,
+    "lib": ["DOM", "ES2023"], "jsx": "react-jsx", "skipLibCheck": true
+  }
+}
