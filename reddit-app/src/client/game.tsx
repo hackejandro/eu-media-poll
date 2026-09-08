@@ -1,7 +1,16 @@
 import './style.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import type { GameResponse, SubmitResponse } from '../shared/api';
+
+function dayLabel(day: string): string {
+  return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
+    .format(new Date(`${day}T12:00:00Z`));
+}
+
+function prettyIdentity(identity: string): string {
+  return identity.toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
 
 function App() {
   const [game, setGame] = useState<GameResponse | null>(null);
@@ -9,14 +18,16 @@ function App() {
   const [vote, setVote] = useState<'A' | 'B' | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const predictionInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => { void fetch('/api/game').then((r) => r.json()).then(setGame).catch(() => setError('Could not load today’s game.')); }, []);
 
   async function submit() {
     if (!vote) return;
+    const submittedPrediction = Number(predictionInput.current?.value ?? prediction);
     setBusy(true); setError('');
     try {
-      const response = await fetch('/api/answer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prediction, vote }) });
+      const response = await fetch('/api/answer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prediction: submittedPrediction, vote }) });
       const saved = await response.json() as SubmitResponse;
       if (!response.ok || !saved.ok) throw new Error(saved.message ?? 'Could not save your answer.');
       setGame((current) => current ? { ...current, ...saved, question: current.question, yesterday: current.yesterday } : saved);
@@ -24,34 +35,42 @@ function App() {
     finally { setBusy(false); }
   }
 
-  if (error && !game) return <main className="state"><h1>Something went wrong.</h1><p>{error}</p></main>;
+  if (error && !game) return <main className="state"><span className="eyebrow">EUobserver Think Tank</span><h1>Something went wrong.</h1><p>{error}</p></main>;
   if (!game) return <main className="state"><div className="loader"/><p>Reading the Brussels room…</p></main>;
-  if (!game.question) return <main className="state"><div className="masthead">EUobserver</div><h1>No Think Tank today.</h1><p>{game.message}</p></main>;
+  if (!game.question) return <main className="state"><span className="eyebrow">EUobserver Think Tank</span><h1>No Think Tank today.</h1><p>{game.message}</p></main>;
 
   const q = game.question;
   const answer = game.answer;
-  return <main className="game">
-    <header><div className="masthead">EUobserver</div><div className="meta"><span>Think Tank</span>{game.identity && <span className="identity">{game.identity}</span>}</div></header>
-    {game.yesterday?.question && <section className="yesterday"><div><b>Yesterday’s result</b><p>{game.yesterday.question}</p></div><strong>{Math.round(game.yesterday.option_a_pct ?? 0)}%</strong></section>}
-    <section className="question">
-      <span className="kicker">Today’s question</span><h1>{q.question}</h1>
+  return <main>
+    <header className="eo-header"><span className="eo-logo">eu<strong>observer</strong></span><span className="eo-header-tag">Think Tank</span></header>
+    <section className="screen">
+      <div className="dayline"><time dateTime={q.day}>{dayLabel(q.day)}</time>{game.identity && <span className="identity">{prettyIdentity(game.identity)}</span>}</div>
+      <span className="eyebrow">EUobserver Think Tank</span>
+      <h1 className="hero-title">Guess what <em>Europe</em> thinks.</h1>
+      <p className="hero-sub">Predict how other EUobserver readers will answer today’s question. Then answer it yourself. Tomorrow, see who read the room best.</p>
+      {game.yesterday?.question && <section className="yesterday-card"><div><span className="label">Yesterday’s result</span><h2>{game.yesterday.question}</h2><p>{game.yesterday.responses ?? 0} {(game.yesterday.responses ?? 0) === 1 ? 'person' : 'people'} played.</p></div><div className="yesterday-score"><strong>{Math.round(game.yesterday.option_a_pct ?? 0)}%</strong><span>chose {game.yesterday.option_a}</span></div></section>}
+      <section className="question-block">
+      <span className="question-number">Today’s question</span><h2 className="question-title">{q.question}</h2>
       {answer?.answered ? <Locked game={game}/> : <>
-        <div className="step"><span>1</span><div><h2>Read the room</h2><p>What percentage of r/euobserver will choose <b>{q.option_a}</b>?</p></div></div>
-        <div className="prediction"><strong>{prediction}%</strong><input aria-label="Crowd prediction" type="range" min="0" max="100" value={prediction} onChange={(event) => setPrediction(Number(event.target.value))}/><div><span>0%</span><span>100%</span></div></div>
-        <div className="step"><span>2</span><div><h2>Your own vote</h2><p>What do you think?</p></div></div>
-        <div className="choices"><button className={vote === 'A' ? 'selected' : ''} onClick={() => setVote('A')}>{q.option_a}</button><button className={vote === 'B' ? 'selected' : ''} onClick={() => setVote('B')}>{q.option_b}</button></div>
+        <div className="step"><div className="step-label">1 · Read the room</div><div className="step-question">What percentage of players will choose <strong>{q.option_a}</strong>?</div>
+          <div className="prediction-wrap"><div className="prediction-readout"><strong>{prediction}%</strong><span>of players</span></div><input className="range" ref={predictionInput} aria-label="Crowd prediction" type="range" min="0" max="100" step="1" value={prediction} onInput={(event) => setPrediction(Number(event.currentTarget.value))}/><div className="range-labels"><span>0%</span><span>50%</span><span>100%</span></div></div>
+        </div>
+        <div className="step"><div className="step-label">2 · Your vote</div><div className="step-question">And what do <em>you</em> think?</div>
+          <div className="vote-grid"><button className={`vote-btn${vote === 'A' ? ' selected' : ''}`} onClick={() => setVote('A')}><strong>{q.option_a}</strong><span>Choose this answer</span></button><button className={`vote-btn${vote === 'B' ? ' selected' : ''}`} onClick={() => setVote('B')}><strong>{q.option_b}</strong><span>Choose this answer</span></button></div>
+        </div>
         {!game.authenticated && <p className="notice">Sign in to Reddit to lock in your answer and keep your streak.</p>}
         {error && <p className="error">{error}</p>}
-        <button className="primary lock" disabled={!vote || busy || !game.authenticated} onClick={() => void submit()}>{busy ? 'Saving…' : 'Lock in my answer'}</button>
+        <div className="action-row"><button className="eo-btn" disabled={!vote || busy || !game.authenticated} onClick={() => void submit()}>{busy ? 'Saving…' : 'Lock in my answer'}</button><span className="action-hint">Results unlock tomorrow.</span></div>
       </>}
+      </section>
+      <div className="footer-note">One answer per Reddit account</div>
     </section>
-    <footer>Results unlock tomorrow · One answer per account</footer>
   </main>;
 }
 
 function Locked({ game }: { game: GameResponse }) {
   const answer = game.answer!; const q = game.question!;
-  return <div className="locked"><div className="check">✓</div><h2>You’re locked in.</h2><p>You predicted <b>{answer.prediction}%</b> will choose <b>{q.option_a}</b>.</p><p>Your answer: <b>{answer.vote === 'A' ? q.option_a : q.option_b}</b></p><div className="streak"><strong>{game.streak ?? 1}</strong><span>day streak</span></div><small>Come back tomorrow to see the crowd result and how many players you beat.</small></div>;
+  return <div className="locked-card"><div className="big-check">✓</div><h2>You’re locked in.</h2><p>You predicted <strong>{answer.prediction}%</strong> of players will choose <strong>{q.option_a}</strong>. Your own answer: <strong>{answer.vote === 'A' ? q.option_a : q.option_b}</strong>.</p><div className="streak"><strong>{game.streak ?? 1}</strong><span>day streak</span></div><p className="come-back"><strong>Come back tomorrow</strong> to see the crowd result and how many players you beat.</p></div>;
 }
 
 createRoot(document.getElementById('root')!).render(<App />);

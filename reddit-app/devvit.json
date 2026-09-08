@@ -28,6 +28,14 @@
       }
     ]
   },
+  "scheduler": {
+    "tasks": {
+      "daily-publish": {
+        "endpoint": "/internal/scheduler/daily-publish",
+        "cron": "0 4,5 * * *"
+      }
+    }
+  },
   "permissions": {
     "http": {
       "domains": [
