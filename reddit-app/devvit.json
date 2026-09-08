@@ -4,11 +4,19 @@
   "post": {
     "dir": "dist/client",
     "entrypoints": {
-      "default": { "inline": true, "entry": "splash.html" },
-      "game": { "entry": "game.html" }
+      "default": {
+        "inline": true,
+        "entry": "splash.html"
+      },
+      "game": {
+        "entry": "game.html"
+      }
     }
   },
-  "server": { "dir": "dist/server", "entry": "index.cjs" },
+  "server": {
+    "dir": "dist/server",
+    "entry": "index.cjs"
+  },
   "menu": {
     "items": [
       {
@@ -21,8 +29,18 @@
     ]
   },
   "permissions": {
-    "http": { "domains": ["czvyukhxfdvjgljgxrke.supabase.co"] },
+    "http": {
+      "domains": [
+        "czvyukhxfdvjgljgxrke.supabase.co"
+      ]
+    },
     "redis": true
   },
-  "scripts": { "dev": "vite build --watch", "build": "vite build" }
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build"
+  },
+  "dev": {
+    "subreddit": "euobserver_feed_dev"
+  }
 }
