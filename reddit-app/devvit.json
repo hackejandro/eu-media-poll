@@ -1,6 +1,6 @@
 {
   "$schema": "https://developers.reddit.com/schema/config-file.v1.json",
-  "name": "euobserver-think-tank",
+  "name": "euobs-think-tank",
   "post": {
     "dir": "dist/client",
     "entrypoints": {
