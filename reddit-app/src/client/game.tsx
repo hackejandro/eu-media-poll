@@ -46,21 +46,21 @@ function App() {
     <section className="screen">
       <div className="dayline"><time dateTime={q.day}>{dayLabel(q.day)}</time>{game.identity && <span className="identity">{prettyIdentity(game.identity)}</span>}</div>
       <span className="eyebrow">EUobserver Think Tank</span>
-      <h1 className="hero-title">Guess what <em>Europe</em> thinks.</h1>
-      <p className="hero-sub">Predict how other EUobserver readers will answer today’s question. Then answer it yourself. Tomorrow, see who read the room best.</p>
+      <h1 className="hero-title">Can you read <span className="accent">Europe</span>?</h1>
+      <p className="hero-sub">First, forecast how other players will vote. Then cast your own vote. Tomorrow, find out how well you read the crowd.</p>
       {game.yesterday?.question && <section className="yesterday-card"><div><span className="label">Yesterday’s result</span><h2>{game.yesterday.question}</h2><p>{game.yesterday.responses ?? 0} {(game.yesterday.responses ?? 0) === 1 ? 'person' : 'people'} played.</p></div><div className="yesterday-score"><strong>{Math.round(game.yesterday.option_a_pct ?? 0)}%</strong><span>chose {game.yesterday.option_a}</span></div></section>}
       <section className="question-block">
       <span className="question-number">Today’s question</span><h2 className="question-title">{q.question}</h2>
       {answer?.answered ? <Locked game={game}/> : <>
-        <div className="step"><div className="step-label">1 · Read the room</div><div className="step-question">What percentage of players will choose <strong>{q.option_a}</strong>?</div>
-          <div className="prediction-wrap"><div className="prediction-readout"><strong>{prediction}%</strong><span>of players</span></div><input className="range" ref={predictionInput} aria-label="Crowd prediction" type="range" min="0" max="100" step="1" value={prediction} onInput={(event) => setPrediction(Number(event.currentTarget.value))}/><div className="range-labels"><span>0%</span><span>50%</span><span>100%</span></div></div>
+        <div className="step"><div className="step-label">1 · Forecast the crowd</div><div className="step-question">What percentage of players will vote <strong>{q.option_a}</strong>?</div>
+          <div className="prediction-wrap"><div className="prediction-readout"><strong>{prediction}%</strong><span>of players will vote {q.option_a}</span></div><input className="range" ref={predictionInput} aria-label="Crowd forecast" type="range" min="0" max="100" step="1" value={prediction} onInput={(event) => setPrediction(Number(event.currentTarget.value))}/><div className="range-labels"><span>0%</span><span>50%</span><span>100%</span></div></div>
         </div>
-        <div className="step"><div className="step-label">2 · Your vote</div><div className="step-question">And what do <em>you</em> think?</div>
+        <div className="step"><div className="step-label">2 · Cast your vote</div><div className="step-question">Now forget the crowd. What do <em>you</em> think?</div>
           <div className="vote-grid"><button className={`vote-btn${vote === 'A' ? ' selected' : ''}`} onClick={() => setVote('A')}><strong>{q.option_a}</strong><span>Choose this answer</span></button><button className={`vote-btn${vote === 'B' ? ' selected' : ''}`} onClick={() => setVote('B')}><strong>{q.option_b}</strong><span>Choose this answer</span></button></div>
         </div>
         {!game.authenticated && <p className="notice">Sign in to Reddit to lock in your answer and keep your streak.</p>}
         {error && <p className="error">{error}</p>}
-        <div className="action-row"><button className="eo-btn" disabled={!vote || busy || !game.authenticated} onClick={() => void submit()}>{busy ? 'Saving…' : 'Lock in my answer'}</button><span className="action-hint">Results unlock tomorrow.</span></div>
+        <div className="action-row"><button className="eo-btn" disabled={!vote || busy || !game.authenticated} onClick={() => void submit()}>{busy ? 'Saving…' : 'Lock in both answers'}</button><span className="action-hint">Your forecast and vote cannot be changed. The crowd result is revealed tomorrow.</span></div>
       </>}
       </section>
       <div className="footer-note">One answer per Reddit account</div>
@@ -70,7 +70,7 @@ function App() {
 
 function Locked({ game }: { game: GameResponse }) {
   const answer = game.answer!; const q = game.question!;
-  return <div className="locked-card"><div className="big-check">✓</div><h2>You’re locked in.</h2><p>You predicted <strong>{answer.prediction}%</strong> of players will choose <strong>{q.option_a}</strong>. Your own answer: <strong>{answer.vote === 'A' ? q.option_a : q.option_b}</strong>.</p><div className="streak"><strong>{game.streak ?? 1}</strong><span>day streak</span></div><p className="come-back"><strong>Come back tomorrow</strong> to see the crowd result and how many players you beat.</p></div>;
+  return <div className="locked-card"><div className="big-check">✓</div><h2>You’re locked in.</h2><p>Your crowd forecast: <strong>{answer.prediction}% {q.option_a}</strong><br/>Your own vote: <strong>{answer.vote === 'A' ? q.option_a : q.option_b}</strong></p><div className="streak"><strong>{game.streak ?? 1}</strong><span>day streak</span></div><p className="come-back"><strong>Come back tomorrow</strong> to see the result, how close your forecast was, and how many players you outpredicted.</p></div>;
 }
 
 createRoot(document.getElementById('root')!).render(<App />);

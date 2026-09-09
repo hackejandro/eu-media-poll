@@ -61,7 +61,7 @@ button { cursor: pointer; }
   line-height: 1.06;
 }
 .hero-title { margin: 9px 0 14px; font-size: clamp(43px, 9vw, 70px); letter-spacing: -.025em; }
-.hero-title em { color: var(--orange); font-weight: 400; }
+.hero-title .accent { color: var(--orange); }
 .hero-sub { margin: 0; max-width: 610px; color: var(--navy-60); font-size: 15px; }
 
 .yesterday-card {
