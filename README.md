@@ -55,6 +55,10 @@ With either Supabase value empty, the frontend runs in self-contained demo mode.
 
 Enable Pages for the repository's default branch and root folder. If the repository is later renamed, update `siteUrl` in `config.js` and the quiz URLs in `supabase/admin_views.sql`.
 
+## Reddit game
+
+`reddit-app/` contains the Devvit Web version for r/euobserver. It shares the published question and aggregate response pool with this site, while privately mapping each signed-in Reddit account to a Brussels identity in Devvit Redis. See `reddit-app/README.md` for local testing and Reddit review requirements.
+
 ## Editorial workflow
 
 1. Add/schedule questions in the Supabase `questions` table.

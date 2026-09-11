@@ -1,0 +1,5 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": { "outDir": "../dist/types/shared", "rootDir": "../src/shared", "lib": ["WebWorker", "ES2023"] },
+  "include": ["../src/shared/**/*"]
+}
