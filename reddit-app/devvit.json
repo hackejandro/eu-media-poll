@@ -6,6 +6,7 @@
     "entrypoints": {
       "default": {
         "inline": true,
+        "height": "regular",
         "entry": "splash.html"
       },
       "game": {
@@ -41,6 +42,9 @@
       "domains": [
         "czvyukhxfdvjgljgxrke.supabase.co"
       ]
+    },
+    "reddit": {
+      "enable": true
     },
     "redis": true
   },

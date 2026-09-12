@@ -76,9 +76,14 @@ button { cursor: pointer; }
 .yesterday-card .label { color: var(--orange); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.3px; }
 .yesterday-card h2 { margin: 5px 0 3px; font: 600 21px/1.13 var(--serif); }
 .yesterday-card p { margin: 0; font-size: 11px; color: var(--navy-60); }
-.yesterday-score { min-width: 78px; text-align: right; }
-.yesterday-score strong { display: block; font: 400 32px/1 var(--serif); }
-.yesterday-score span { color: var(--navy-50); font-size: 10px; }
+.yesterday-result { min-width: 78px; text-align: right; }
+.yesterday-result strong { display: block; font: 400 32px/1 var(--serif); }
+.yesterday-result span { color: var(--navy-50); font-size: 10px; }
+.personal-score { grid-column: 1 / -1; display: grid; grid-template-columns: auto 1fr; gap: 15px; align-items: center; padding-top: 15px; border-top: 1px solid var(--grey-3); }
+.score-number { display: flex; align-items: baseline; min-width: 84px; color: var(--orange); }
+.score-number strong { font: 400 40px/1 var(--serif); }
+.score-number span { font-size: 12px; font-weight: 700; }
+.personal-score p { margin-top: 3px; }
 
 .question-block { border-top: 1px solid var(--navy); padding-top: 27px; }
 .question-number { color: var(--orange); }
@@ -113,6 +118,7 @@ button { cursor: pointer; }
 .action-hint, .footer-note { color: var(--navy-50); font-size: 11px; }
 .notice, .error { font-size: 12px; }
 .notice { margin: 16px 0 0; padding: 10px 12px; background: var(--orange-soft); }
+.leaderboard-note { margin: 16px 0 0; color: var(--navy-50); font-size: 11px; }
 .error { color: #b42318; }
 
 .locked-card { margin-top: 29px; padding: 25px; border: 1px solid var(--navy); }
@@ -131,15 +137,19 @@ button { cursor: pointer; }
 .loader { width: 34px; height: 34px; margin: auto; border: 3px solid var(--grey-3); border-top-color: var(--orange); border-radius: 50%; animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.splash { min-height: 100vh; background: var(--white); }
-.splash-body { max-width: 760px; margin: 0 auto; padding: clamp(34px, 8vw, 70px) 24px; }
+.inline-view, .inline-view body, .inline-view #root { height: 100%; min-height: 0; overflow: hidden; }
+.splash { height: 100%; min-height: 0; overflow: hidden; display: flex; flex-direction: column; background: var(--white); }
+.splash .eo-header { height: 48px; flex: 0 0 48px; }
+.splash .eo-logo { font-size: 25px; }
+.splash-body { width: 100%; max-width: 760px; margin: 0 auto; padding: 18px 22px 14px; overflow: hidden; }
 .splash .hero-title { max-width: 650px; }
-.splash .hero-sub { margin-bottom: 8px; }
+.splash .hero-title { margin: 0 0 8px; font-size: clamp(29px, 5.4vw, 40px); line-height: 1.02; }
+.splash .hero-sub { margin-bottom: 0; font-size: 13px; line-height: 1.35; }
+.splash .action-row { margin-top: 13px; }
+.splash .eo-btn { min-height: 38px; }
 .splash-player { display: block; margin-top: 10px; color: var(--navy-50); font-size: 11px; }
-.splash-rule { width: 100%; margin: 28px 0 0; border: 0; border-top: 1px solid var(--navy); }
-.splash-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; border: 1px solid var(--navy); background: var(--navy); }
-.splash-steps span { padding: 13px; background: var(--white); color: var(--navy-60); font-size: 11px; }
-.splash-steps b { display: block; margin-bottom: 3px; color: var(--orange); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; }
+.splash-flow { display: flex; align-items: center; gap: 7px; margin-top: 11px; color: var(--navy-50); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .55px; white-space: nowrap; }
+.splash-flow i { color: var(--orange); font-style: normal; }
 
 @media (max-width: 520px) {
   .screen { padding: 27px 17px 40px; }
@@ -147,12 +157,18 @@ button { cursor: pointer; }
   .hero-sub { font-size: 14px; }
   .dayline { margin-bottom: 24px; }
   .yesterday-card { grid-template-columns: 1fr; gap: 10px; }
-  .yesterday-score { text-align: left; }
+  .yesterday-result { text-align: left; }
   .question-title { font-size: 34px; }
   .vote-grid { grid-template-columns: 1fr; }
   .action-row .eo-btn { width: 100%; }
   .action-hint { width: 100%; text-align: center; }
   .locked-card { padding: 21px 18px; }
-  .splash-body { padding: 32px 18px 42px; }
-  .splash-steps { grid-template-columns: 1fr; }
+  .splash-body { padding: 16px 17px 12px; }
+  .splash .hero-title { font-size: 31px; }
+  .splash .hero-sub { font-size: 12px; }
+  .splash-flow { font-size: 9px; gap: 5px; letter-spacing: .35px; }
+}
+
+@media (max-width: 350px) {
+  .splash-flow { display: none; }
 }
