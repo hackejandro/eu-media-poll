@@ -12,6 +12,10 @@ function prettyIdentity(identity: string): string {
   return identity.toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
+function predictionScore(error: number): number {
+  return Math.max(0, Math.round(100 - error));
+}
+
 function App() {
   const [game, setGame] = useState<GameResponse | null>(null);
   const [prediction, setPrediction] = useState(50);
@@ -48,7 +52,15 @@ function App() {
       <span className="eyebrow">EUobserver Think Tank</span>
       <h1 className="hero-title">Can you read <span className="accent">Europe</span>?</h1>
       <p className="hero-sub">First, forecast how other players will vote. Then cast your own vote. Tomorrow, find out how well you read the crowd.</p>
-      {game.yesterday?.question && <section className="yesterday-card"><div><span className="label">Yesterday’s result</span><h2>{game.yesterday.question}</h2><p>{game.yesterday.responses ?? 0} {(game.yesterday.responses ?? 0) === 1 ? 'person' : 'people'} played.</p></div><div className="yesterday-score"><strong>{Math.round(game.yesterday.option_a_pct ?? 0)}%</strong><span>chose {game.yesterday.option_a}</span></div></section>}
+      {game.yesterday?.question && <section className="yesterday-card">
+        <div><span className="label">Yesterday’s result</span><h2>{game.yesterday.question}</h2><p>{game.yesterday.responses ?? 0} {(game.yesterday.responses ?? 0) === 1 ? 'person' : 'people'} played.</p></div>
+        <div className="yesterday-result"><strong>{Math.round(game.yesterday.option_a_pct ?? 0)}%</strong><span>chose {game.yesterday.option_a}</span></div>
+        {game.yesterday.user && <div className="personal-score">
+          <div className="score-number"><strong>{predictionScore(game.yesterday.user.error)}</strong><span>/100</span></div>
+          <div><span className="label">Your score</span><p>Your {game.yesterday.user.prediction}% forecast missed by {Math.round(game.yesterday.user.error)} {Math.round(game.yesterday.user.error) === 1 ? 'point' : 'points'}.
+            {game.yesterday.user.beat_pct !== null && ` You outpredicted ${Math.round(game.yesterday.user.beat_pct)}% of players.`}</p></div>
+        </div>}
+      </section>}
       <section className="question-block">
       <span className="question-number">Today’s question</span><h2 className="question-title">{q.question}</h2>
       {answer?.answered ? <Locked game={game}/> : <>
@@ -58,7 +70,9 @@ function App() {
         <div className="step"><div className="step-label">2 · Cast your vote</div><div className="step-question">Now forget the crowd. What do <em>you</em> think?</div>
           <div className="vote-grid"><button className={`vote-btn${vote === 'A' ? ' selected' : ''}`} onClick={() => setVote('A')}><strong>{q.option_a}</strong><span>Choose this answer</span></button><button className={`vote-btn${vote === 'B' ? ' selected' : ''}`} onClick={() => setVote('B')}><strong>{q.option_b}</strong><span>Choose this answer</span></button></div>
         </div>
-        {!game.authenticated && <p className="notice">Sign in to Reddit to lock in your answer and keep your streak.</p>}
+        {!game.authenticated
+          ? <p className="notice">Sign in to Reddit to lock in your answer and keep your streak.</p>
+          : <p className="leaderboard-note">The top three scores may appear in tomorrow’s leaderboard with your Reddit handle.</p>}
         {error && <p className="error">{error}</p>}
         <div className="action-row"><button className="eo-btn" disabled={!vote || busy || !game.authenticated} onClick={() => void submit()}>{busy ? 'Saving…' : 'Lock in both answers'}</button><span className="action-hint">Your forecast and vote cannot be changed. The crowd result is revealed tomorrow.</span></div>
       </>}
