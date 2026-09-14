@@ -72,7 +72,7 @@ function App() {
         </div>
         {!game.authenticated
           ? <p className="notice">Sign in to Reddit to lock in your answer and keep your streak.</p>
-          : <p className="leaderboard-note">The top three scores may appear in tomorrow’s leaderboard with your Reddit handle.</p>}
+          : <p className="leaderboard-note">The top ten scores may appear in tomorrow’s leaderboard with your Reddit handle.</p>}
         {error && <p className="error">{error}</p>}
         <div className="action-row"><button className="eo-btn" disabled={!vote || busy || !game.authenticated} onClick={() => void submit()}>{busy ? 'Saving…' : 'Lock in both answers'}</button><span className="action-hint">Your forecast and vote cannot be changed. The crowd result is revealed tomorrow.</span></div>
       </>}

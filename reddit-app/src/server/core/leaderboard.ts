@@ -11,7 +11,7 @@ export function scorePrediction(prediction: number, actual: number): number {
   return Math.max(0, Math.round(100 - Math.abs(prediction - actual)));
 }
 
-export function rankPlayers(players: DailyPlayer[], actual: number, limit = 3): LeaderboardEntry[] {
+export function rankPlayers(players: DailyPlayer[], actual: number, limit = 10): LeaderboardEntry[] {
   return players
     .filter((player) => Number.isFinite(player.prediction) && player.prediction >= 0 && player.prediction <= 100)
     .map((player) => ({ ...player, score: scorePrediction(player.prediction, actual) }))
